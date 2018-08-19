@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="detail_text_size" tools:keep="@dimen/detail_text_size">15sp</dimen>
+    <dimen name="margin_default" tools:keep="@dimen/margin_default">8dp</dimen>
+    <dimen name="movie_item_width">170dp</dimen>
+</resources>

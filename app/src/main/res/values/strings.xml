@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">MoviesPlanet</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="action_filter">Filter</string>
+    <string name="filter_settings">Filter Settings</string>
+
+    <string name="pref_filter_label">Filter By</string>
+    <string name="pref_filter_key" translatable="false">filter_by</string>
+    <string name="pref_filter_default" translatable="false">@string/pref_filter_popular_value</string>
+
+
+
+    <string name="pref_filter_now_playing_label">Now Playing</string>
+    <string name="pref_filter_popular_label">Popular</string>
+    <string name="pref_filter_top_rated_label">Top Rated</string>
+    <string name="pref_filter_upcoming_label">Upcoming</string>
+    <string name="pref_filter_now_playing_value" translatable="false">now_playing</string>
+    <string name="pref_filter_popular_value" translatable="false">popular</string>
+    <string name="pref_filter_top_rated_value" translatable="false">top_rated</string>
+    <string name="pref_filter_upcoming_value" translatable="false">upcoming</string>
+
+    <string name="message_movie_detail_error">Error getting movie</string>
+
+    <string name="text_movie_ratings">%.1f/10</string>
+    <string name="title_movies">%s Movies</string>
+    <string name="postal_img_description">%s Postal</string>
+    <string name="message_no_network_connection">No Connection available</string>
+    <string name="label_overview">Overview</string>
+    <string name="label_rating">Rating</string>
+    <string name="label_release_date">Release date</string>
+    <string name="label_original_title">Original title</string>
+    <string name="label_close">close</string>
+    <string name="desc_close_photo">close photo</string>
+</resources>
