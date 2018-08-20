@@ -1,52 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="movie"
-            type="com.naijaplanet.magosla.android.moviesplanet.models.Movie"/>
+            type="com.naijaplanet.magosla.android.moviesplanet.models.Movie" />
+
         <variable
             name="photo_url"
-            type="String"/>
+            type="String" />
     </data>
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv_movie_item"
-        android:backgroundTint="@color/color_card"
         android:layout_width="@dimen/movie_item_width"
         android:layout_height="wrap_content"
-        card_view:cardUseCompatPadding="true"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        card_view:cardCornerRadius="5dp"
         android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:backgroundTint="@color/color_card"
+        card_view:cardCornerRadius="5dp"
+        card_view:cardUseCompatPadding="true"
         card_view:targetApi="lollipop">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <ImageView
                 android:id="@+id/iv_postal"
                 android:layout_width="match_parent"
-                android:contentDescription="@{@string/postal_img_description(movie.title)}"
                 android:layout_height="200dp"
-              android:scaleType="fitCenter"
-                android:tintMode="src_in"
-                android:src="@{photo_url}"/>
+                android:contentDescription="@{@string/postal_img_description(movie.title)}"
+                android:scaleType="fitCenter"
+                android:src="@{photo_url}" />
 
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:hint=""
                 android:paddingTop="8dp"
                 android:singleLine="true"
-                android:ellipsize="end"
-                android:text="@{movie.title}"
-                android:hint="" />
+                android:text="@{movie.title}" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </layout>
