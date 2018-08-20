@@ -46,8 +46,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:adjustViewBounds="true"
-                    android:backgroundTintMode="src_in"
-                    android:backgroundTint="@color/color_text"
                     android:contentDescription="@{@string/postal_img_description(movie.title)}"
                     android:fitsSystemWindows="true"
                     android:scaleType="fitCenter"
