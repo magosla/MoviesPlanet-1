@@ -15,7 +15,7 @@ import com.naijaplanet.magosla.android.moviesplanet.R;
 
 /**
  * Creates a expandable text view
- * Source {{@see @https://codexplo.wordpress.com/2013/09/07/android-expandable-textview/}}
+ * Source {@see @https://codexplo.wordpress.com/2013/09/07/android-expandable-textview/}
  *
  */
 @SuppressWarnings("unused")
