@@ -12,20 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class MoviesResult {
+public class MoviesResult extends Results<Movie>{
     private String resultFilter;
-    private List<Movie> movies;
-    private int page;
-    private int totalPages;
-    private int totalResults;
-
-    public MoviesResult(){
-        movies = new ArrayList<>();
-    }
-
-    public List<Movie> getMovies() {
-        return movies;
-    }
 
     public String getResultFilter() {
         return resultFilter;
@@ -33,34 +21,6 @@ public class MoviesResult {
 
     public void setResultFilter(String resultFilter) {
         this.resultFilter = resultFilter;
-    }
-
-    public void setMovies(List<Movie> movies) {
-        this.movies = movies;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public int getTotalResults() {
-        return totalResults;
-    }
-
-    public void setTotalResults(int totalResults) {
-        this.totalResults = totalResults;
     }
 
     public static MoviesResult fromJson(JSONObject data){
@@ -100,7 +60,7 @@ public class MoviesResult {
 
                         movies[i] = movie;
                     }
-                    moviesResult.setMovies(Arrays.asList(movies));
+                    moviesResult.setResults(Arrays.asList(movies));
                 }
 
             } catch (JSONException e) {

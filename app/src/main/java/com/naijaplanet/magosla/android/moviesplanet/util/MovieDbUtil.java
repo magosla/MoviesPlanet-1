@@ -8,11 +8,15 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.naijaplanet.magosla.android.moviesplanet.Config;
 import com.naijaplanet.magosla.android.moviesplanet.R;
 import com.naijaplanet.magosla.android.moviesplanet.data.MoviesResult;
+import com.naijaplanet.magosla.android.moviesplanet.data.ReviewsResult;
+import com.naijaplanet.magosla.android.moviesplanet.data.VideosResult;
+import com.naijaplanet.magosla.android.moviesplanet.models.Video;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -57,13 +61,34 @@ public class MovieDbUtil {
     }
 
     /**
+     * The URL for Youtube video thumbnail
+     *
+     * @param key  the youtube video key
+     * @return the url string
+     */
+    public static String getYoutubeThumbnailUrl(String key) {
+        return String.format(Config.YOUTUBE_THUMBNAIL_URL_FORMAT, key);
+    }
+
+
+    /**
+     * The URL for Youtube video URL
+     *
+     * @param key  the youtube video key
+     * @return the url string
+     */
+    public static String getYoutubeVideoUrl(String key) {
+        return String.format(Config.YOUTUBE_VIDEO_URL_FORMAT, key);
+    }
+
+    /**
      * The URL to use for the request
      *
      * @param page   the page number
      * @param filter the filter for the results
      * @return the url string
      */
-    private static String getUrl(int page, String filter) {
+    private static String getMoviesUrl(int page, String filter) {
         HttpUrl url = HttpUrl.parse(Config.MOVIEDB_BASE_URL);
         if(url != null) //noinspection DanglingJavadoc
         {
@@ -73,10 +98,45 @@ public class MovieDbUtil {
             }
             urlBuilder.addQueryParameter("page", String.valueOf(((page < 1) ? 1 : page)));
 
-            /**
-             * The Movie database API key defined in {@link Config.MOVIEDB_API_KEY}
-             */
-            urlBuilder.addQueryParameter("api_key", Config.MOVIEDB_API_KEY);
+            return urlBuilder.build().toString();
+        }
+        return "";
+
+    }
+
+    /**
+     * The URL for the  movies videos
+     *
+     * @param movieId   the id of the movie
+     * @return the url string
+     */
+    public static String getMovieVideosUrl(int movieId) {
+        HttpUrl url = HttpUrl.parse(Config.MOVIEDB_BASE_URL);
+        if(url != null) //noinspection DanglingJavadoc
+        {
+            HttpUrl.Builder urlBuilder = url.newBuilder();
+            urlBuilder.addPathSegments(String.format(Config.MOVIE_VIDEOS_URI_TEMPLATE,movieId));
+
+            return urlBuilder.build().toString();
+        }
+        return "";
+    }
+
+    /**
+     * The URL for movie reviews
+     *
+     * @param movieId   the id of the movie
+     * @param page   the page number
+     * @return the url string
+     */
+    public static String getMovieReviewsUrl(int movieId, int page) {
+        HttpUrl url = HttpUrl.parse(Config.MOVIEDB_BASE_URL);
+        if(url != null) //noinspection DanglingJavadoc
+        {
+            HttpUrl.Builder urlBuilder = url.newBuilder();
+            urlBuilder.addPathSegments(String.format(Config.MOVIE_REVIEW_URI_TEMPLATE, movieId));
+            urlBuilder.addQueryParameter("page", String.valueOf(((page < 1) ? 1 : page)));
+
             return urlBuilder.build().toString();
         }
         return "";
@@ -86,15 +146,16 @@ public class MovieDbUtil {
     /**
      * Get the Movies record with the provided criteria
      *
+     * @param context the application {@link Context}
      * @param page     the page number
      * @param filter   criteria to filter the result
      * @param callback the callback if an error was encountered
      * @return an instance of {{@link MoviesResult}}
      */
-    public static MoviesResult getRecord(final Context context, int page, String filter, final Callback callback) {
+    public static MoviesResult getMoviesRecord(final Context context, int page, String filter, final Callback callback) {
 
         Request request = new Request.Builder()
-                .url(getUrl(page, filter))
+                .url(getMoviesUrl(page, filter))
                 .build();
 
         MoviesResult moviesResult = null;
@@ -137,6 +198,115 @@ public class MovieDbUtil {
             });
         }
         return moviesResult;
+    }
+
+    /**
+     * Get the Reviews record with the provided criteria
+     *
+     * @param context the application {@link Context}
+     * @param movieId     the {@link com.naijaplanet.magosla.android.moviesplanet.models.Movie} id
+     * @param page     the page number
+     * @param callback the callback if an error was encountered
+     * @return an instance of {{@link MoviesResult}}
+     */
+    public static ReviewsResult getReviewsRecord(final Context context, int movieId, int page, final Callback callback) {
+
+        Request request = new Request.Builder()
+                .url(getMovieReviewsUrl(movieId, page))
+                .build();
+
+        ReviewsResult reviewsResult = null;
+
+        try {
+            Response response = getHttpClient().newCall(request).execute();
+            try {
+                ResponseBody body = response.body();
+                //noinspection StatementWithEmptyBody
+                if (body != null) {
+                    String responseData = body.string();
+                    JSONObject moviesObject = new JSONObject(responseData);
+
+                    if (moviesObject.has("results")) {
+                        reviewsResult = ReviewsResult.fromJson(moviesObject);
+                    }
+                    // TODO what to do when the response has no results field
+                } else {
+                    // TODO what to do when the response body is empty
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // TODO action to perform if there is a JSONException
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO action to perform if there is an IOException error
+            new InternetCheck(new InternetCheck.Consumer() {
+                @Override
+                public void accept(Boolean internet) {
+                    if(!internet){
+                        if(callback!= null) {
+                            callback.error(context.getString(R.string.message_no_network_connection));
+                        }
+                    }
+                }
+            });
+        }
+        return reviewsResult;
+    }
+
+    /**
+     * Get the Video record with the provided movie id
+     *
+     * @param context the application {@link Context}
+     * @param movieId the id of the movie
+     * @param callback the callback if an error was encountered
+     * @return an instance of {@link VideosResult}
+     */
+    public static VideosResult getVideosRecord(final Context context, int movieId, final Callback callback) {
+
+        Request request = new Request.Builder()
+                .url(getMovieVideosUrl(movieId))
+                .build();
+
+        VideosResult videosResult = null;
+
+        try {
+            Response response = getHttpClient().newCall(request).execute();
+            try {
+                ResponseBody body = response.body();
+                //noinspection StatementWithEmptyBody
+                if (body != null) {
+                    String responseData = body.string();
+                    JSONObject moviesObject = new JSONObject(responseData);
+
+                    if (moviesObject.has("results")) {
+                        videosResult = VideosResult.fromJson(moviesObject);
+                    }
+                    // TODO what to do when the response has no results field
+                } else {
+                    // TODO what to do when the response body is empty
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // TODO action to perform if there is a JSONException
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO action to perform if there is an IOException error
+            new InternetCheck(new InternetCheck.Consumer() {
+                @Override
+                public void accept(Boolean internet) {
+                    if(!internet){
+                        if(callback!= null) {
+                            callback.error(context.getString(R.string.message_no_network_connection));
+                        }
+                    }
+                }
+            });
+        }
+        return videosResult;
     }
 
     /**

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_movie_videos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"></android.support.v7.widget.RecyclerView>
+        <TextView
+            android:id="@+id/tv_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|left"
+            android:layout_margin="10dp"
+            android:text="@string/msg_loading"
+            android:textStyle="italic"
+            android:visibility="gone"/>
+        <TextView
+            android:id="@+id/tv_no_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|left"
+            android:layout_margin="10dp"
+            android:text="@string/msg_no_video"
+            android:textStyle="italic"
+            android:visibility="gone"/>
+    </FrameLayout>
+</layout>

@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
             android:src="@mipmap/ic_launcher"
+            android:text="Loading..."
             android:visibility="gone" />
     </FrameLayout>
 </layout>

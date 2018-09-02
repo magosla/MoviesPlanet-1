@@ -19,8 +19,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             return new SettingsFragment();
     }
 
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setRetainInstance(true);
         addPreferencesFromResource(R.xml.pref_movie_filters);
 
         PreferenceScreen preferenceScreen = getPreferenceScreen();

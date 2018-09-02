@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="review"
+            type="com.naijaplanet.magosla.android.moviesplanet.models.Review" />
+
+        <variable
+            name="icon_letter"
+            type="String" />
+    </data>
+
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/journal_item_layout"
+            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/tv_icon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="-5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/review_icon_text"
+                android:gravity="center"
+                android:text="@{icon_letter}"
+                android:textAllCaps="true"
+                android:textColor="@color/colorSecondaryLight"
+                android:textSize="30dp"
+                app:layout_constraintTop_toTopOf="@+id/text_author"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_content" />
+
+        <com.naijaplanet.magosla.android.moviesplanet.widget.ExpandableTextView
+                android:id="@+id/text_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@{review.content}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv_icon"
+                app:layout_constraintTop_toBottomOf="@+id/text_author" />
+
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="12sp"
+                android:layout_height="12sp"
+                android:src="@drawable/ic_person_16dp"
+                android:tint="@color/colorSecondaryLight"
+                app:layout_constraintBottom_toTopOf="@+id/text_author"
+                app:layout_constraintStart_toStartOf="@+id/text_content"
+                app:layout_constraintTop_toBottomOf="@+id/text_author"
+                />
+
+            <TextView
+                android:id="@+id/text_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="8dp"
+                android:text="@{review.author}"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                app:layout_constraintLeft_toRightOf="@+id/imageView2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_goneMarginLeft="8dp"
+                app:layout_goneMarginStart="8dp" />
+
+        </android.support.constraint.ConstraintLayout>
+
+</layout>

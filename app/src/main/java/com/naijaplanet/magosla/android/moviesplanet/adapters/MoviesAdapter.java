@@ -24,7 +24,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesViewHolder> {
 
 
     public interface OnEventListener {
-        void onMovieItemClick(Movie movie);
+        void onItemClick(Movie item);
     }
 
     public MoviesAdapter(Context context, MoviesRecord moviesRecord, OnEventListener eventListener) {

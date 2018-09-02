@@ -3,6 +3,8 @@ package com.naijaplanet.magosla.android.moviesplanet.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
@@ -18,33 +20,41 @@ import com.naijaplanet.magosla.android.moviesplanet.Config;
 import com.naijaplanet.magosla.android.moviesplanet.EndlessRecyclerOnScrollListener;
 import com.naijaplanet.magosla.android.moviesplanet.R;
 import com.naijaplanet.magosla.android.moviesplanet.adapters.MoviesAdapter;
-import com.naijaplanet.magosla.android.moviesplanet.data.MoviesLoader;
+import com.naijaplanet.magosla.android.moviesplanet.loaders.MoviesLoader;
 import com.naijaplanet.magosla.android.moviesplanet.data.MoviesResult;
 import com.naijaplanet.magosla.android.moviesplanet.databinding.ActivityMainBinding;
 import com.naijaplanet.magosla.android.moviesplanet.fragments.SettingsFragment;
 import com.naijaplanet.magosla.android.moviesplanet.models.Movie;
 import com.naijaplanet.magosla.android.moviesplanet.models.MoviesRecord;
+import com.naijaplanet.magosla.android.moviesplanet.util.ActivityUtil;
 import com.naijaplanet.magosla.android.moviesplanet.util.GridItemSpacingDecoration;
 import com.naijaplanet.magosla.android.moviesplanet.util.GridItemsSpanSpacing;
 
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, MoviesAdapter.OnEventListener{
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, MoviesAdapter.OnEventListener {
     private static final String BUNDLE_MOVIE_RECORD = "MOVIES_SAVE_KEY";
-    private static final String BUNDLE_FILTER_SETTING_STATE ="filter_setting_state";
+    private static final String BUNDLE_FILTER_SETTING_STATE = "filter_setting_state";
     private MoviesRecord mMoviesRecord;
     private MoviesLoader mMoviesLoader;
     private ActivityMainBinding mActivityMainBinding;
     private boolean movieFilterSettingActive;
     private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
+    private int mSettingsFragmentComitId;
+
     private Toast mToast;
 
     private boolean mMoviesLoading; // to keep track of when movie loading is in process
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+// try to enable activity change transitions if supported
+        ActivityUtil.enableTransition(this);
         // used to inspect network request in chrome inspector
         Stetho.initializeWithDefaults(this);
         // register the sharedpreference change listener
@@ -65,14 +75,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         checkForFilterOpenState(savedInstanceState);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this,1);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         layoutManager.setSmoothScrollbarEnabled(true);
 
         final MoviesAdapter moviesAdapter = new MoviesAdapter(this, mMoviesRecord, this);
         mActivityMainBinding.rvMovieList.setLayoutManager(layoutManager);
         mActivityMainBinding.rvMovieList.setAdapter(moviesAdapter);
 
-        GridItemsSpanSpacing gridItemsSpanSpacing = new GridItemsSpanSpacing( mActivityMainBinding.rvMovieList,
+        GridItemsSpanSpacing gridItemsSpanSpacing = new GridItemsSpanSpacing(mActivityMainBinding.rvMovieList,
                 R.dimen.movie_item_width, 0, layoutManager.getOrientation(), true);
 
         layoutManager.setSpanCount(gridItemsSpanSpacing.getSpan());
@@ -84,12 +94,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     /**
      * Check is the movies filter was opened in the Application's previous state
+     *
      * @param savedInstanceState the instance {@link Bundle}
      */
     private void checkForFilterOpenState(Bundle savedInstanceState) {
-        if(savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_FILTER_SETTING_STATE)){
+        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_FILTER_SETTING_STATE)) {
             movieFilterSettingActive = savedInstanceState.getBoolean(BUNDLE_FILTER_SETTING_STATE);
-            if(movieFilterSettingActive){
+            if (movieFilterSettingActive) {
                 movieFilterSettingActive = false; // to allow the settings open since we are toggling the setting
                 toggleMovieFilterSetting();
             }
@@ -98,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     /**
      * Check is there is {@link MoviesRecord} from the Application's previous state
+     *
      * @param savedInstanceState the saved instance {@link Bundle}
      */
     private void checkForSavedMoviesInstance(Bundle savedInstanceState) {
@@ -105,21 +117,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mMoviesRecord = savedInstanceState.getParcelable(BUNDLE_MOVIE_RECORD);
         }
 
-        if(mMoviesRecord != null){
+        if (mMoviesRecord != null) {
             updateTitle(mMoviesRecord.getMovieDbFilter());
-        }else {
+        } else {
             mMoviesRecord = new MoviesRecord();
         }
     }
 
     private void updateTitle(CharSequence title) {
         setTitle(getString(R.string.title_movies, title)
-                .toUpperCase().replace("_"," "));
+                .toUpperCase().replace("_", " "));
     }
 
     @Override
     public void onBackPressed() {
-        if(movieFilterSettingActive){
+        if (movieFilterSettingActive) {
             toggleMovieFilterSetting();
             return;
         }
@@ -129,21 +141,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     /**
      * Show or hide the setting to filter movies
      */
-    private void toggleMovieFilterSetting(){
+    private void toggleMovieFilterSetting() {
+        int fragmentId = mActivityMainBinding.flSettingsHolder.getId();
 
-        if(movieFilterSettingActive){
-            getSupportFragmentManager().beginTransaction()
-                    .remove(getSupportFragmentManager()
-                            .findFragmentById(mActivityMainBinding.flSettingsHolder.getId())
-                    ).commit();
-            movieFilterSettingActive = false;
-        }else{
-            getSupportFragmentManager().beginTransaction()
-                    .replace(mActivityMainBinding.flSettingsHolder.getId(),SettingsFragment.create()).commit();
-            movieFilterSettingActive = true;
+        FragmentManager fm = getSupportFragmentManager();
+        SettingsFragment settingsFragment = (SettingsFragment) fm.findFragmentById(fragmentId);
+        if (settingsFragment == null) {
+            mSettingsFragmentComitId =
+                    fm.beginTransaction()
+                            .replace(fragmentId, SettingsFragment.create())
+                            .addToBackStack(null).commit();
+        } else {
+            fm.popBackStack(mSettingsFragmentComitId, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
     }
-
 
 
     @Override
@@ -165,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
             @Override
             public void onLoadMore() {
-                Log.d("Loading more called", "status is "+ String.valueOf(mMoviesLoading));
+                Log.d("Loading more called", "status is " + String.valueOf(mMoviesLoading));
                 if (!mMoviesLoading) {
                     loadMovies(mMoviesRecord.getCurrentPage() + 1, mMoviesRecord.getMovieDbFilter());
                 }
@@ -184,7 +195,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     /**
      * Method to load movies
-     * @param page {{int}} page numbers
+     *
+     * @param page   {{int}} page numbers
      * @param filter {{String}} filter for the movies to load
      */
     private void loadMovies(int page, String filter) {
@@ -199,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     /**
      * Initialize the movie loader
+     *
      * @param moviesAdapter a {@link MoviesAdapter} instance
      */
     private void initializeMovieLoader(final MoviesAdapter moviesAdapter) {
@@ -212,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onLoadFinished(MoviesResult moviesResult) {
                 mMoviesRecord.addMovies(moviesResult);
-                if (!moviesResult.getMovies().isEmpty()) {
+                if (!moviesResult.getResults().isEmpty()) {
                     moviesAdapter.notifyDataSetChanged();
                 }
                 mMoviesLoading = false;
@@ -267,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(movieFilterSettingActive){
+        if (movieFilterSettingActive) {
             //noinspection ConstantConditions
             outState.putBoolean(BUNDLE_FILTER_SETTING_STATE, movieFilterSettingActive);
         }
@@ -281,18 +294,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    public void onMovieItemClick(Movie movie) {
-        Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-        intent.putExtra(Config.EXTRA_MOVIE_KEY, movie);
-        startActivity(intent);
+    public void onItemClick(Movie movie) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Config.EXTRA_MOVIE_KEY, movie);
+        ActivityUtil.lunchActivityWithTransition(this, DetailsActivity.class, bundle);
+        // Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+        //intent.putExtra(Config.EXTRA_MOVIE_KEY, movie);
+        // startActivity(intent);
     }
 
     /**
      * Shows a message about the application status, in the event of error
+     *
      * @param message the message {@link String} to display
      */
-    private void showMessage(String message){
-        if(mToast != null ){
+    private void showMessage(String message) {
+        if (mToast != null) {
             mToast.cancel();
         }
         mToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);

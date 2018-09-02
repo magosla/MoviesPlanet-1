@@ -1,4 +1,4 @@
-package com.naijaplanet.magosla.android.moviesplanet.data;
+package com.naijaplanet.magosla.android.moviesplanet.loaders;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 
+import com.naijaplanet.magosla.android.moviesplanet.data.MoviesResult;
 import com.naijaplanet.magosla.android.moviesplanet.util.MovieDbUtil;
 
 public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult> {
@@ -22,6 +23,7 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
         mContext = context;
         mLoaderManager = loaderManager;
         mCallback = callback;
+
     }
 
     public void load(int page, String filter) {
@@ -30,7 +32,6 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
         bundle.putInt(BUNDLE_PAGE_KEY, page);
 
         //Loader<String> moviesResult = mLoaderManager.getLoader(MOVIE_LIST_LOADER);
-
 
         mLoaderManager.initLoader(getLoaderKey(page, filter), bundle, this);
     }
@@ -52,11 +53,13 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
 
         if (data != null) {
             mCallback.onLoadFinished(data);
+        }else{
+            // destroy the loader so it can be retried on request
+            mLoaderManager.destroyLoader(loader.getId());
         }
 
-        // TODO what to do when the response has no results field
-
     }
+
 
     @NonNull
     @Override
@@ -122,7 +125,7 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
             int page = mArgs.getInt(BUNDLE_PAGE_KEY, 1);
             String filter = mArgs.getString(BUNDLE_FILTER_KEY, null);
 
-            return MovieDbUtil.getRecord(getContext(),page, filter, new MovieDbUtil.Callback() {
+            return MovieDbUtil.getMoviesRecord(getContext(),page, filter, new MovieDbUtil.Callback() {
                 @Override
                 public void error(String msg) {
                     if (mMovieLoaderCallback != null)
@@ -130,5 +133,6 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
                 }
             });
         }
+
     }
 }

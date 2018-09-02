@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.App" parent="Base.Theme.App">
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">#AA000000</item>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-    </style>
-
-    <style name="BaseAppTheme" parent="android:Theme.Material" tools:keep="@style/BaseAppTheme">
         <!-- enable window content transitions -->
         <item name="android:windowActivityTransitions">true</item>
 
@@ -22,4 +17,10 @@
             @transition/change_image_transform</item>
     </style>
 
+    <style name="Theme.App.NoActionBar" parent="Theme.App">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
 </resources>

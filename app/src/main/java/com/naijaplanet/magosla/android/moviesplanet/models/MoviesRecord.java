@@ -25,11 +25,11 @@ public class MoviesRecord implements Parcelable {
     private int mTotalMoviesAvailable;
     private int mTotalMoviesFetched;
     private List<Movie> mMovies;
-    private String mMovieDbFilter;
+    private String mMovieDbFilter = "";
 
     public MoviesRecord() {
         mMovies = new ArrayList<>();
-        mMovieDbFilter="";
+       // mMovieDbFilter="";
     }
 
     private MoviesRecord(Parcel in) {
@@ -121,12 +121,12 @@ public class MoviesRecord implements Parcelable {
             // we are using a different filter, so empty any previous data
             reset();
         }
-        if ((!moviesResult.getMovies().isEmpty() || filterChanged) &&
+        if ((!moviesResult.getResults().isEmpty() || filterChanged) &&
                 // this below expression prevent duplicate addition
                 !(mCurrentPage == moviesResult.getPage() && mMovieDbFilter.equals(moviesResult.getResultFilter()))
                 ) {
 
-            mMovies.addAll(moviesResult.getMovies());
+            mMovies.addAll(moviesResult.getResults());
             mTotalMoviesFetched = mMovies.size();
             mMovieDbFilter = moviesResult.getResultFilter();
             mTotalMoviesAvailable = moviesResult.getTotalResults();
